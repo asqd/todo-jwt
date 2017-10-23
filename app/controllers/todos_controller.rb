@@ -2,13 +2,18 @@ class TodosController < ApplicationController
   before_action :set_todo, only: [:show, :update, :destroy]
 
   def index
-    @todos = Todo.all
+  else
+    @todos = if current_user
+      current_user.todos
+    else
+      Todo.all
+    end
 
     json_response(@todos)
   end
 
   def create
-    @todo = Todo.create!(todo_params)
+    @todo = current_user.todos.create!(todo_params)
 
     json_response(@todo, :created)
   end
@@ -29,7 +34,7 @@ class TodosController < ApplicationController
 
   private
   def todo_params
-    params.permit(:title, :created_by)
+    params.permit(:title)
   end
 
   def set_todo
